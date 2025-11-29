@@ -1,11 +1,14 @@
+// Screen where hospitals create blood donation events
 import 'package:flutter/material.dart';
 
+// StatefulWidget because we need to track form inputs
 class CreateEventScreen extends StatefulWidget {
   @override
   _CreateEventScreenState createState() => _CreateEventScreenState();
 }
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
+  // Controllers to get text from input fields
   final TextEditingController titleController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -15,22 +18,28 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Top app bar
       appBar: AppBar(
         title: Text("Create Event"),
         backgroundColor: Colors.blue,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+
+      body: SingleChildScrollView(  // Makes form scrollable
+        padding: EdgeInsets.all(16),  // Space around form
+
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,  // Align to left
+
           children: [
+            // Form section title
             Text(
               "Event Information",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
+
             SizedBox(height: 20),
 
-            // Event Title
+            // Event title input
             TextField(
               controller: titleController,
               decoration: InputDecoration(
@@ -43,7 +52,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
             SizedBox(height: 15),
 
-            // Location
+            // Location input
             TextField(
               controller: locationController,
               decoration: InputDecoration(
@@ -56,7 +65,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
             SizedBox(height: 15),
 
-            // Date Picker
+            // Date picker field
             TextField(
               controller: dateController,
               decoration: InputDecoration(
@@ -65,16 +74,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
                 hintText: "Tap to select date",
               ),
-              readOnly: true,
+              readOnly: true,  // Prevent manual typing
+
+              // When tapped, show date picker dialog
               onTap: () async {
                 DateTime? picked = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2026),
+                  initialDate: DateTime.now(),  // Start at today
+                  firstDate: DateTime.now(),  // Can't select past dates
+                  lastDate: DateTime(2026),  // Can select up to year 2026
                 );
 
+                // If user selected a date (didn't cancel)
                 if (picked != null) {
+                  // Format and display the selected date
                   dateController.text = "${picked.day}/${picked.month}/${picked.year}";
                 }
               },
@@ -82,7 +95,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
             SizedBox(height: 15),
 
-            // Time Picker
+            // Time picker field
             TextField(
               controller: timeController,
               decoration: InputDecoration(
@@ -91,14 +104,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 prefixIcon: Icon(Icons.access_time, color: Colors.blue),
                 hintText: "Tap to select time",
               ),
-              readOnly: true,
+              readOnly: true,  // Prevent manual typing
+
+              // When tapped, show time picker dialog
               onTap: () async {
                 TimeOfDay? picked = await showTimePicker(
                   context: context,
-                  initialTime: TimeOfDay.now(),
+                  initialTime: TimeOfDay.now(),  // Start at current time
                 );
 
+                // If user selected a time (didn't cancel)
                 if (picked != null) {
+                  // Format and display the selected time
                   timeController.text = picked.format(context);
                 }
               },
@@ -106,10 +123,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
             SizedBox(height: 15),
 
-            // Description
+            // Event description input (multi-line)
             TextField(
               controller: descriptionController,
-              maxLines: 4,
+              maxLines: 4,  // Multi-line text area
               decoration: InputDecoration(
                 labelText: "Event Description",
                 border: OutlineInputBorder(),
@@ -119,9 +136,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
             SizedBox(height: 30),
 
-            // Create Button
+            // Create event button
             SizedBox(
-              width: double.infinity,
+              width: double.infinity,  // Full width
               height: 50,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -130,7 +147,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: _createEvent,
+                onPressed: _createEvent,  // Call validation function
                 child: Text(
                   "Create Event",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -143,15 +160,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
+  // Validates form and creates event
   void _createEvent() {
-    // Validate fields
+    // Validate title is filled
     if (titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please enter event title")),
       );
-      return;
+      return;  // Stop execution
     }
 
+    // Validate location is filled
     if (locationController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please enter location")),
@@ -159,6 +178,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       return;
     }
 
+    // Validate date is selected
     if (dateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please select event date")),
@@ -166,6 +186,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       return;
     }
 
+    // Validate time is selected
     if (timeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please select event time")),
@@ -173,7 +194,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       return;
     }
 
-    // Show success message
+    // If all validations pass, show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Event created successfully!"),
@@ -181,7 +202,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       ),
     );
 
-    // Go back
+    // Return to previous screen
     Navigator.pop(context);
   }
 }

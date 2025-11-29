@@ -1,20 +1,25 @@
+// Screen showing information about the XwinLink app
 import 'package:flutter/material.dart';
 
+// StatelessWidget because content is static
 class AboutAppScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Top app bar
       appBar: AppBar(
         title: Text("About App"),
         backgroundColor: Colors.red,
       ),
-      body: SingleChildScrollView(
+
+      body: SingleChildScrollView(  // Makes content scrollable
         padding: EdgeInsets.all(20),
+
         child: Column(
           children: [
             SizedBox(height: 20),
 
-            // App Logo
+            // App logo icon
             Icon(
               Icons.favorite,
               size: 100,
@@ -23,7 +28,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 15),
 
-            // App Name
+            // App name
             Text(
               "XwinLink",
               style: TextStyle(
@@ -35,6 +40,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 5),
 
+            // App tagline
             Text(
               "Community Blood Network",
               style: TextStyle(
@@ -45,7 +51,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 10),
 
-            // Version
+            // Version number
             Text(
               "Version 1.0.0",
               style: TextStyle(
@@ -56,9 +62,9 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 30),
 
-            // About Text
+            // About section card
             Card(
-              elevation: 2,
+              elevation: 2,  // Shadow depth
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -67,6 +73,7 @@ class AboutAppScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Section title
                     Text(
                       "About XwinLink",
                       style: TextStyle(
@@ -75,14 +82,18 @@ class AboutAppScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 15),
+
+                    // Mission statement
                     Text(
                       "XwinLink is a community-driven platform connecting blood donors with those in need. Our mission is to save lives by making blood donation easier and more accessible.",
                       style: TextStyle(
                         fontSize: 15,
-                        height: 1.5,
+                        height: 1.5,  // Line spacing
                       ),
                     ),
                     SizedBox(height: 15),
+
+                    // Additional description
                     Text(
                       "Through our app, hospitals can post urgent blood requests, organize donation events, and connect with registered donors in real-time.",
                       style: TextStyle(
@@ -97,7 +108,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 20),
 
-            // Features Card
+            // Features section card
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -108,6 +119,7 @@ class AboutAppScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Section title
                     Text(
                       "Key Features",
                       style: TextStyle(
@@ -116,11 +128,33 @@ class AboutAppScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 15),
-                    _buildFeature(Icons.bloodtype, "Find Blood Requests", "Discover urgent blood needs near you"),
-                    _buildFeature(Icons.event, "Donation Events", "Participate in community blood drives"),
-                    _buildFeature(Icons.verified_user, "Verified Donors", "Secure identity verification process"),
-                    _buildFeature(Icons.local_hospital, "Hospital Network", "Connected with trusted medical facilities"),
-                    _buildFeature(Icons.stars, "Earn Points", "Get rewarded for saving lives"),
+
+                    // List all key features
+                    _buildFeature(
+                      Icons.bloodtype,
+                      "Find Blood Requests",
+                      "Discover urgent blood needs near you",
+                    ),
+                    _buildFeature(
+                      Icons.event,
+                      "Donation Events",
+                      "Participate in community blood drives",
+                    ),
+                    _buildFeature(
+                      Icons.verified_user,
+                      "Verified Donors",
+                      "Secure identity verification process",
+                    ),
+                    _buildFeature(
+                      Icons.local_hospital,
+                      "Hospital Network",
+                      "Connected with trusted medical facilities",
+                    ),
+                    _buildFeature(
+                      Icons.stars,
+                      "Earn Points",
+                      "Get rewarded for saving lives",
+                    ),
                   ],
                 ),
               ),
@@ -128,7 +162,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 20),
 
-            // Contact Card
+            // Contact information card
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -139,6 +173,7 @@ class AboutAppScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Section title
                     Text(
                       "Contact Us",
                       style: TextStyle(
@@ -147,6 +182,8 @@ class AboutAppScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 15),
+
+                    // Contact methods
                     _buildContactItem(Icons.email, "support@xwinlink.com"),
                     _buildContactItem(Icons.phone, "+964 770 123 4567"),
                     _buildContactItem(Icons.language, "www.xwinlink.com"),
@@ -157,7 +194,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 20),
 
-            // Social Media
+            // Social media section
             Text(
               "Follow Us",
               style: TextStyle(
@@ -166,6 +203,8 @@ class AboutAppScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 15),
+
+            // Social media icon buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -179,7 +218,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 30),
 
-            // Footer
+            // Copyright footer
             Text(
               "© 2025 XwinLink. All rights reserved.",
               style: TextStyle(
@@ -190,6 +229,7 @@ class AboutAppScreen extends StatelessWidget {
 
             SizedBox(height: 10),
 
+            // Made with love message
             Text(
               "Made with ❤️ for the community",
               style: TextStyle(
@@ -205,18 +245,23 @@ class AboutAppScreen extends StatelessWidget {
     );
   }
 
+  // Creates a feature row with icon, title, and description
   Widget _buildFeature(IconData icon, String title, String description) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Feature icon
           Icon(icon, color: Colors.red, size: 24),
           SizedBox(width: 15),
+
+          // Feature text
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Feature title
                 Text(
                   title,
                   style: TextStyle(
@@ -225,6 +270,7 @@ class AboutAppScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4),
+                // Feature description
                 Text(
                   description,
                   style: TextStyle(
@@ -240,6 +286,7 @@ class AboutAppScreen extends StatelessWidget {
     );
   }
 
+  // Creates a contact information row
   Widget _buildContactItem(IconData icon, String text) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12),
@@ -256,13 +303,14 @@ class AboutAppScreen extends StatelessWidget {
     );
   }
 
+  // Creates a circular social media button
   Widget _buildSocialButton(IconData icon, Color color) {
     return Container(
       width: 50,
       height: 50,
       decoration: BoxDecoration(
         color: color,
-        shape: BoxShape.circle,
+        shape: BoxShape.circle,  // Makes container circular
       ),
       child: Icon(
         icon,

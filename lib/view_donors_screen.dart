@@ -1,8 +1,9 @@
-
+// Screen showing list of registered blood donors
 import 'package:flutter/material.dart';
 
+// StatelessWidget because donor list is static (in real app would fetch from database)
 class ViewDonorsScreen extends StatelessWidget {
-  // Sample donor data (in real app, this comes from database)
+  // Sample donor data (in production, this comes from backend database)
   final List<Map<String, dynamic>> donors = [
     {
       "name": "Ahmed Ali",
@@ -10,7 +11,7 @@ class ViewDonorsScreen extends StatelessWidget {
       "phone": "0770 123 4567",
       "lastDonation": "2 months ago",
       "totalDonations": 5,
-      "status": "Available",
+      "status": "Available",  // Whether donor can donate now
     },
     {
       "name": "Sara Mohammed",
@@ -26,7 +27,7 @@ class ViewDonorsScreen extends StatelessWidget {
       "phone": "0780 456 7890",
       "lastDonation": "1 month ago",
       "totalDonations": 3,
-      "status": "Not Available",
+      "status": "Not Available",  // Too recent donation
     },
     {
       "name": "Layla Hassan",
@@ -49,10 +50,12 @@ class ViewDonorsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Top app bar with search button
       appBar: AppBar(
         title: Text("Registered Donors"),
         backgroundColor: Colors.red,
         actions: [
+          // Search icon button (placeholder functionality)
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
@@ -63,26 +66,35 @@ class ViewDonorsScreen extends StatelessWidget {
           ),
         ],
       ),
+
       body: Column(
         children: [
-          // Stats Bar
+          // Statistics bar at top
           Container(
             padding: EdgeInsets.all(16),
-            color: Colors.red[50],
+            color: Colors.red[50],  // Light red background
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                // Total donors count
                 _buildStatItem("Total Donors", "${donors.length}"),
-                _buildStatItem("Available", "${donors.where((d) => d['status'] == 'Available').length}"),
+
+                // Available donors count (filtered from list)
+                _buildStatItem(
+                  "Available",
+                  "${donors.where((d) => d['status'] == 'Available').length}",
+                ),
               ],
             ),
           ),
 
-          // Donors List
+          // Scrollable list of donor cards
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.all(16),
-              itemCount: donors.length,
+              itemCount: donors.length,  // Number of cards to build
+
+              // Build each donor card
               itemBuilder: (context, index) {
                 return _buildDonorCard(context, donors[index]);
               },
@@ -93,9 +105,11 @@ class ViewDonorsScreen extends StatelessWidget {
     );
   }
 
+  // Creates a statistic display with label and value
   Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
+        // Large number
         Text(
           value,
           style: TextStyle(
@@ -105,28 +119,34 @@ class ViewDonorsScreen extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4),
+        // Label below number
         Text(label, style: TextStyle(color: Colors.grey[700])),
       ],
     );
   }
 
+  // Creates a donor information card
   Widget _buildDonorCard(BuildContext context, Map<String, dynamic> donor) {
+    // Check if donor is currently available to donate
     bool isAvailable = donor['status'] == 'Available';
 
     return Card(
-      margin: EdgeInsets.only(bottom: 12),
-      elevation: 2,
+      margin: EdgeInsets.only(bottom: 12),  // Space below card
+      elevation: 2,  // Shadow depth
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12),  // Rounded corners
       ),
+
       child: Padding(
         padding: EdgeInsets.all(16),
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             Row(
               children: [
-                // Avatar
+                // Profile picture placeholder
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.red[100],
@@ -135,11 +155,12 @@ class ViewDonorsScreen extends StatelessWidget {
 
                 SizedBox(width: 15),
 
-                // Info
+                // Donor information section
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Donor name
                       Text(
                         donor['name'],
                         style: TextStyle(
@@ -147,7 +168,10 @@ class ViewDonorsScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
                       SizedBox(height: 4),
+
+                      // Blood type and donation count
                       Row(
                         children: [
                           Icon(Icons.bloodtype, size: 16, color: Colors.red),
@@ -170,12 +194,12 @@ class ViewDonorsScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Status Badge
+                // Status badge (Available/Not Available)
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: isAvailable ? Colors.green[100] : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20),  // Pill shape
                   ),
                   child: Text(
                     donor['status'],
@@ -191,7 +215,7 @@ class ViewDonorsScreen extends StatelessWidget {
 
             SizedBox(height: 12),
 
-            // Additional Info
+            // Contact information row
             Row(
               children: [
                 Icon(Icons.phone, size: 16, color: Colors.grey[600]),
@@ -206,34 +230,41 @@ class ViewDonorsScreen extends StatelessWidget {
 
             SizedBox(height: 12),
 
-            // Contact Button
+            // Contact button (only enabled if donor is available)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: Icon(Icons.call, size: 18),
                 label: Text("Contact Donor"),
                 style: ElevatedButton.styleFrom(
+                  // Button color changes based on availability
                   backgroundColor: isAvailable ? Colors.red : Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+
+                // Button only works if donor is available
                 onPressed: isAvailable
                     ? () {
+                  // Show confirmation dialog
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
                       title: Text("Contact ${donor['name']}"),
                       content: Text("Call ${donor['phone']}?"),
                       actions: [
+                        // Cancel button
                         TextButton(
                           child: Text("Cancel"),
                           onPressed: () => Navigator.pop(context),
                         ),
+                        // Call button
                         TextButton(
                           child: Text("Call"),
                           onPressed: () {
                             Navigator.pop(context);
+                            // Show calling message (in real app, would initiate phone call)
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Calling ${donor['name']}..."),
@@ -245,7 +276,7 @@ class ViewDonorsScreen extends StatelessWidget {
                     ),
                   );
                 }
-                    : null,
+                    : null,  // Disabled if not available
               ),
             ),
           ],
