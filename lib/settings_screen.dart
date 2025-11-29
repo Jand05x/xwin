@@ -19,6 +19,9 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.lock),
             title: Text("Change Password"),
+             onTap: () {
+        Navigator.pushNamed(context, '/change_password');
+      },
           ),
           ListTile(
             leading: Icon(Icons.language),

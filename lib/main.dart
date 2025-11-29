@@ -10,6 +10,8 @@ import 'events_screen.dart';
 import 'hospital_dashboard_screen.dart';
 import 'verification_queue_screen.dart';
 import 'learn_about_donation_screen.dart';
+import 'change_password_screen.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -33,6 +35,8 @@ class MyApp extends StatelessWidget {
         '/hospital_dashboard': (context) => HospitalDashboardScreen(),
         '/verify': (context) => VerificationQueueScreen(),
         '/learn': (context) => LearnAboutDonationScreen(),
+        '/change_password': (context) => ChangePasswordScreen(),
+
       },
     );
   }
