@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'about_app_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -30,6 +31,12 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.info),
             title: Text("About App"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AboutAppScreen()),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.delete, color: Colors.red),
