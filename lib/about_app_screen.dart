@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 
 // StatelessWidget because content is static
 class AboutAppScreen extends StatelessWidget {
+  const AboutAppScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // Top app bar
-      appBar: AppBar(
-        title: Text("About App"),
-        backgroundColor: Colors.red,
-      ),
+      appBar: AppBar(title: Text("About App"), backgroundColor: Colors.red),
 
-      body: SingleChildScrollView(  // Makes content scrollable
+      body: SingleChildScrollView(
+        // Makes content scrollable
         padding: EdgeInsets.all(20),
 
         child: Column(
@@ -20,11 +20,7 @@ class AboutAppScreen extends StatelessWidget {
             SizedBox(height: 20),
 
             // App logo icon
-            Icon(
-              Icons.favorite,
-              size: 100,
-              color: Colors.red,
-            ),
+            Icon(Icons.favorite, size: 100, color: Colors.red),
 
             SizedBox(height: 15),
 
@@ -43,10 +39,7 @@ class AboutAppScreen extends StatelessWidget {
             // App tagline
             Text(
               "Community Blood Network",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
 
             SizedBox(height: 10),
@@ -54,17 +47,14 @@ class AboutAppScreen extends StatelessWidget {
             // Version number
             Text(
               "Version 1.0.0",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
             ),
 
             SizedBox(height: 30),
 
             // About section card
             Card(
-              elevation: 2,  // Shadow depth
+              elevation: 2, // Shadow depth
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -88,7 +78,7 @@ class AboutAppScreen extends StatelessWidget {
                       "XwinLink is a community-driven platform connecting blood donors with those in need. Our mission is to save lives by making blood donation easier and more accessible.",
                       style: TextStyle(
                         fontSize: 15,
-                        height: 1.5,  // Line spacing
+                        height: 1.5, // Line spacing
                       ),
                     ),
                     SizedBox(height: 15),
@@ -96,10 +86,7 @@ class AboutAppScreen extends StatelessWidget {
                     // Additional description
                     Text(
                       "Through our app, hospitals can post urgent blood requests, organize donation events, and connect with registered donors in real-time.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        height: 1.5,
-                      ),
+                      style: TextStyle(fontSize: 15, height: 1.5),
                     ),
                   ],
                 ),
@@ -197,10 +184,7 @@ class AboutAppScreen extends StatelessWidget {
             // Social media section
             Text(
               "Follow Us",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 15),
 
@@ -221,10 +205,7 @@ class AboutAppScreen extends StatelessWidget {
             // Copyright footer
             Text(
               "© 2025 XwinLink. All rights reserved.",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
             ),
 
             SizedBox(height: 10),
@@ -232,10 +213,7 @@ class AboutAppScreen extends StatelessWidget {
             // Made with love message
             Text(
               "Made with ❤️ for the community",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
             ),
 
             SizedBox(height: 30),
@@ -264,19 +242,13 @@ class AboutAppScreen extends StatelessWidget {
                 // Feature title
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 4),
                 // Feature description
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -294,10 +266,7 @@ class AboutAppScreen extends StatelessWidget {
         children: [
           Icon(icon, color: Colors.red, size: 20),
           SizedBox(width: 12),
-          Text(
-            text,
-            style: TextStyle(fontSize: 15),
-          ),
+          Text(text, style: TextStyle(fontSize: 15)),
         ],
       ),
     );
@@ -310,13 +279,9 @@ class AboutAppScreen extends StatelessWidget {
       height: 50,
       decoration: BoxDecoration(
         color: color,
-        shape: BoxShape.circle,  // Makes container circular
+        shape: BoxShape.circle, // Makes container circular
       ),
-      child: Icon(
-        icon,
-        color: Colors.white,
-        size: 28,
-      ),
+      child: Icon(icon, color: Colors.white, size: 28),
     );
   }
 }

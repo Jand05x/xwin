@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 // StatefulWidget because we need to track form state and inputs
 class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
+
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
@@ -23,9 +25,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       // TODO: Add backend logic to update password in database
 
       // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password changed successfully!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Password changed successfully!')));
 
       // Return to previous screen
       Navigator.pop(context);
@@ -55,14 +57,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
         // Form widget to handle validation
         child: Form(
-          key: _formKey,  // Links form key
+          key: _formKey, // Links form key
 
           child: Column(
             children: [
               // Current password input field
               TextFormField(
                 controller: _currentPasswordController,
-                obscureText: true,  // Hide password with dots
+                obscureText: true, // Hide password with dots
                 decoration: InputDecoration(labelText: 'Current Password'),
 
                 // Validation: check if field is empty
@@ -70,7 +72,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter current password';
                   }
-                  return null;  // Validation passed
+                  return null; // Validation passed
                 },
               ),
 
@@ -79,7 +81,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               // New password input field
               TextFormField(
                 controller: _newPasswordController,
-                obscureText: true,  // Hide password with dots
+                obscureText: true, // Hide password with dots
                 decoration: InputDecoration(labelText: 'New Password'),
 
                 // Validation: check if empty and minimum length
@@ -90,7 +92,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   if (value.length < 6) {
                     return 'Password should be at least 6 characters';
                   }
-                  return null;  // Validation passed
+                  return null; // Validation passed
                 },
               ),
 
@@ -99,7 +101,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               // Confirm password input field
               TextFormField(
                 controller: _confirmPasswordController,
-                obscureText: true,  // Hide password with dots
+                obscureText: true, // Hide password with dots
                 decoration: InputDecoration(labelText: 'Confirm New Password'),
 
                 // Validation: check if matches new password
@@ -107,7 +109,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   if (value != _newPasswordController.text) {
                     return 'Passwords do not match';
                   }
-                  return null;  // Validation passed
+                  return null; // Validation passed
                 },
               ),
 
@@ -115,12 +117,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
               // Change password button
               ElevatedButton(
-                onPressed: _changePassword,  // Call validation function
-                child: Text('Change Password'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                 ),
+                onPressed: _changePassword, // Call validation function
+                child: Text('Change Password'),
               ),
             ],
           ),

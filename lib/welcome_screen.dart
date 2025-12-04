@@ -3,24 +3,28 @@ import 'package:flutter/material.dart';
 
 // StatelessWidget because this screen doesn't change
 class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,  // Screen background color
+      backgroundColor: Colors.white, // Screen background color
 
       body: Padding(
-        padding: const EdgeInsets.all(20),  // Add spacing around edges
+        padding: const EdgeInsets.all(20), // Add spacing around edges
 
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,  // Center content vertically
+          mainAxisAlignment:
+              MainAxisAlignment.center, // Center content vertically
 
           children: [
-            Spacer(),  // Pushes content towards center
+            Spacer(), // Pushes content towards center
+
+            SizedBox(height: 20),
 
             // App logo icon
             Icon(Icons.navigation, size: 80, color: Colors.red),
-            SizedBox(height: 10),  // Space between elements
-
+            SizedBox(height: 10), // Space between elements
             // App name
             Text(
               "XwinLink",
@@ -33,13 +37,15 @@ class WelcomeScreen extends StatelessWidget {
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             ),
 
-            Spacer(),  // Pushes buttons to bottom
-
+            Spacer(), // Pushes buttons to bottom
             // Sign Up button - takes user to registration screen
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,  // Button color
-                minimumSize: Size(double.infinity, 50),  // Full width, 50px height
+                backgroundColor: Colors.red, // Button color
+                minimumSize: Size(
+                  double.infinity,
+                  50,
+                ), // Full width, 50px height
               ),
               child: Text("Sign Up"),
               onPressed: () {
@@ -48,12 +54,11 @@ class WelcomeScreen extends StatelessWidget {
               },
             ),
 
-            SizedBox(height: 10),  // Space between buttons
-
+            SizedBox(height: 10), // Space between buttons
             // Login button - takes user to login screen
             OutlinedButton(
               style: OutlinedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),  // Full width
+                minimumSize: Size(double.infinity, 50), // Full width
               ),
               child: Text("Login"),
               onPressed: () {
@@ -62,7 +67,7 @@ class WelcomeScreen extends StatelessWidget {
               },
             ),
 
-            SizedBox(height: 40),  // Bottom padding
+            SizedBox(height: 40), // Bottom padding
           ],
         ),
       ),

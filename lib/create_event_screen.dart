@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 // StatefulWidget because we need to track form inputs
 class CreateEventScreen extends StatefulWidget {
+  const CreateEventScreen({super.key});
+
   @override
   _CreateEventScreenState createState() => _CreateEventScreenState();
 }
@@ -19,16 +21,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       // Top app bar
-      appBar: AppBar(
-        title: Text("Create Event"),
-        backgroundColor: Colors.blue,
-      ),
+      appBar: AppBar(title: Text("Create Event"), backgroundColor: Colors.blue),
 
-      body: SingleChildScrollView(  // Makes form scrollable
-        padding: EdgeInsets.all(16),  // Space around form
+      body: SingleChildScrollView(
+        // Makes form scrollable
+        padding: EdgeInsets.all(16), // Space around form
 
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,  // Align to left
+          crossAxisAlignment: CrossAxisAlignment.start, // Align to left
 
           children: [
             // Form section title
@@ -74,21 +74,21 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
                 hintText: "Tap to select date",
               ),
-              readOnly: true,  // Prevent manual typing
-
+              readOnly: true, // Prevent manual typing
               // When tapped, show date picker dialog
               onTap: () async {
                 DateTime? picked = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),  // Start at today
-                  firstDate: DateTime.now(),  // Can't select past dates
-                  lastDate: DateTime(2026),  // Can select up to year 2026
+                  initialDate: DateTime.now(), // Start at today
+                  firstDate: DateTime.now(), // Can't select past dates
+                  lastDate: DateTime(2026), // Can select up to year 2026
                 );
 
                 // If user selected a date (didn't cancel)
                 if (picked != null) {
                   // Format and display the selected date
-                  dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+                  dateController.text =
+                      "${picked.day}/${picked.month}/${picked.year}";
                 }
               },
             ),
@@ -104,19 +104,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 prefixIcon: Icon(Icons.access_time, color: Colors.blue),
                 hintText: "Tap to select time",
               ),
-              readOnly: true,  // Prevent manual typing
-
+              readOnly: true, // Prevent manual typing
               // When tapped, show time picker dialog
               onTap: () async {
+                final ctx = context;
+                // ignore: use_build_context_synchronously
                 TimeOfDay? picked = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),  // Start at current time
+                  context: ctx,
+                  initialTime: TimeOfDay.now(), // Start at current time
                 );
 
                 // If user selected a time (didn't cancel)
-                if (picked != null) {
-                  // Format and display the selected time
-                  timeController.text = picked.format(context);
+                if (picked != null && mounted) {
+                  // ignore: use_build_context_synchronously
+                  timeController.text = picked.format(ctx);
                 }
               },
             ),
@@ -126,7 +127,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             // Event description input (multi-line)
             TextField(
               controller: descriptionController,
-              maxLines: 4,  // Multi-line text area
+              maxLines: 4, // Multi-line text area
               decoration: InputDecoration(
                 labelText: "Event Description",
                 border: OutlineInputBorder(),
@@ -138,7 +139,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
             // Create event button
             SizedBox(
-              width: double.infinity,  // Full width
+              width: double.infinity, // Full width
               height: 50,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -147,7 +148,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: _createEvent,  // Call validation function
+                onPressed: _createEvent, // Call validation function
                 child: Text(
                   "Create Event",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -164,33 +165,33 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   void _createEvent() {
     // Validate title is filled
     if (titleController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter event title")),
-      );
-      return;  // Stop execution
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please enter event title")));
+      return; // Stop execution
     }
 
     // Validate location is filled
     if (locationController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter location")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please enter location")));
       return;
     }
 
     // Validate date is selected
     if (dateController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select event date")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please select event date")));
       return;
     }
 
     // Validate time is selected
     if (timeController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select event time")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please select event time")));
       return;
     }
 

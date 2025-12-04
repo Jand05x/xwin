@@ -6,6 +6,8 @@ import 'settings_screen.dart';
 
 // StatefulWidget because we need to track which tab is selected
 class HomeNavigation extends StatefulWidget {
+  const HomeNavigation({super.key});
+
   @override
   _HomeNavigationState createState() => _HomeNavigationState();
 }
@@ -16,9 +18,9 @@ class _HomeNavigationState extends State<HomeNavigation> {
 
   // List of screens corresponding to each bottom tab
   final List<Widget> _pages = [
-    DashboardScreen(),  // Home tab
-    AccountScreen(),    // Account tab
-    SettingsScreen(),   // Settings tab
+    DashboardScreen(), // Home tab
+    AccountScreen(), // Account tab
+    SettingsScreen(), // Settings tab
   ];
 
   @override
@@ -29,14 +31,13 @@ class _HomeNavigationState extends State<HomeNavigation> {
 
       // Bottom navigation bar with 3 tabs
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,  // Highlight selected tab
-        selectedItemColor: Colors.red,  // Color for selected tab
-        unselectedItemColor: Colors.grey,  // Color for unselected tabs
-
+        currentIndex: _currentIndex, // Highlight selected tab
+        selectedItemColor: Colors.red, // Color for selected tab
+        unselectedItemColor: Colors.grey, // Color for unselected tabs
         // Called when user taps a tab
         onTap: (index) {
           setState(() {
-            _currentIndex = index;  // Update selected tab
+            _currentIndex = index; // Update selected tab
           });
         },
 
@@ -44,7 +45,10 @@ class _HomeNavigationState extends State<HomeNavigation> {
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings",
+          ),
         ],
       ),
     );

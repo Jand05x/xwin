@@ -11,7 +11,7 @@ class ViewDonorsScreen extends StatelessWidget {
       "phone": "0770 123 4567",
       "lastDonation": "2 months ago",
       "totalDonations": 5,
-      "status": "Available",  // Whether donor can donate now
+      "status": "Available", // Whether donor can donate now
     },
     {
       "name": "Sara Mohammed",
@@ -27,7 +27,7 @@ class ViewDonorsScreen extends StatelessWidget {
       "phone": "0780 456 7890",
       "lastDonation": "1 month ago",
       "totalDonations": 3,
-      "status": "Not Available",  // Too recent donation
+      "status": "Not Available", // Too recent donation
     },
     {
       "name": "Layla Hassan",
@@ -46,6 +46,8 @@ class ViewDonorsScreen extends StatelessWidget {
       "status": "Available",
     },
   ];
+
+   ViewDonorsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +74,7 @@ class ViewDonorsScreen extends StatelessWidget {
           // Statistics bar at top
           Container(
             padding: EdgeInsets.all(16),
-            color: Colors.red[50],  // Light red background
+            color: Colors.red[50], // Light red background
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -92,8 +94,7 @@ class ViewDonorsScreen extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.all(16),
-              itemCount: donors.length,  // Number of cards to build
-
+              itemCount: donors.length, // Number of cards to build
               // Build each donor card
               itemBuilder: (context, index) {
                 return _buildDonorCard(context, donors[index]);
@@ -131,10 +132,10 @@ class ViewDonorsScreen extends StatelessWidget {
     bool isAvailable = donor['status'] == 'Available';
 
     return Card(
-      margin: EdgeInsets.only(bottom: 12),  // Space below card
-      elevation: 2,  // Shadow depth
+      margin: EdgeInsets.only(bottom: 12), // Space below card
+      elevation: 2, // Shadow depth
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),  // Rounded corners
+        borderRadius: BorderRadius.circular(12), // Rounded corners
       ),
 
       child: Padding(
@@ -199,7 +200,7 @@ class ViewDonorsScreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: isAvailable ? Colors.green[100] : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(20),  // Pill shape
+                    borderRadius: BorderRadius.circular(20), // Pill shape
                   ),
                   child: Text(
                     donor['status'],
@@ -247,36 +248,38 @@ class ViewDonorsScreen extends StatelessWidget {
                 // Button only works if donor is available
                 onPressed: isAvailable
                     ? () {
-                  // Show confirmation dialog
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text("Contact ${donor['name']}"),
-                      content: Text("Call ${donor['phone']}?"),
-                      actions: [
-                        // Cancel button
-                        TextButton(
-                          child: Text("Cancel"),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        // Call button
-                        TextButton(
-                          child: Text("Call"),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            // Show calling message (in real app, would initiate phone call)
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Calling ${donor['name']}..."),
+                        // Show confirmation dialog
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text("Contact ${donor['name']}"),
+                            content: Text("Call ${donor['phone']}?"),
+                            actions: [
+                              // Cancel button
+                              TextButton(
+                                child: Text("Cancel"),
+                                onPressed: () => Navigator.pop(context),
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                    : null,  // Disabled if not available
+                              // Call button
+                              TextButton(
+                                child: Text("Call"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  // Show calling message (in real app, would initiate phone call)
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Calling ${donor['name']}...",
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    : null, // Disabled if not available
               ),
             ),
           ],

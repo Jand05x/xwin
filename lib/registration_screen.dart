@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 // StatefulWidget because we need to track input and dropdown selections
 class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
+
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
@@ -12,6 +14,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   final TextEditingController lastDonationController = TextEditingController();
 
   // Variable to store selected blood type from dropdown
@@ -26,8 +29,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         title: Text("Donor Registration"),
       ),
 
-      body: SingleChildScrollView(  // Makes screen scrollable if content is long
-        padding: EdgeInsets.all(16),  // Space around content
+      body: SingleChildScrollView(
+        // Makes screen scrollable if content is long
+        padding: EdgeInsets.all(16), // Space around content
 
         child: Column(
           children: [
@@ -55,18 +59,33 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
             SizedBox(height: 10),
 
+            // Password input field
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(labelText: "Password"),
+              obscureText: true,
+            ),
+
+            SizedBox(height: 10),
+
             // Blood type dropdown menu
             DropdownButtonFormField<String>(
-              value: selectedBloodType,  // Currently selected value
-
+              initialValue: selectedBloodType, // Currently selected value
               // List of blood type options
-              items: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]
-                  .map((b) => DropdownMenuItem(value: b, child: Text(b)))
-                  .toList(),
+              items: [
+                "A+",
+                "A-",
+                "B+",
+                "B-",
+                "O+",
+                "O-",
+                "AB+",
+                "AB-",
+              ].map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
 
               // Called when user selects an option
               onChanged: (v) {
-                setState(() => selectedBloodType = v);  // Update selected value
+                setState(() => selectedBloodType = v); // Update selected value
               },
 
               decoration: InputDecoration(labelText: "Blood Type"),
@@ -80,24 +99,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               decoration: InputDecoration(
                 labelText: "Last Donation Date",
                 hintText: "Tap to select date",
-                suffixIcon: Icon(Icons.calendar_today),  // Calendar icon
+                suffixIcon: Icon(Icons.calendar_today), // Calendar icon
               ),
-              readOnly: true,  // Prevent manual typing, only allow date picker
-
+              readOnly: true, // Prevent manual typing, only allow date picker
               // When field is tapped, show date picker
               onTap: () async {
                 // Show date picker dialog
                 DateTime? picked = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),  // Start at today
-                  firstDate: DateTime(2000),  // Earliest selectable date
-                  lastDate: DateTime.now(),  // Can't select future dates
+                  initialDate: DateTime.now(), // Start at today
+                  firstDate: DateTime(2000), // Earliest selectable date
+                  lastDate: DateTime.now(), // Can't select future dates
                 );
 
                 // If user selected a date (didn't cancel)
                 if (picked != null) {
                   // Format and display the selected date
-                  lastDonationController.text = "${picked.day}/${picked.month}/${picked.year}";
+                  lastDonationController.text =
+                      "${picked.day}/${picked.month}/${picked.year}";
                 }
               },
             ),
@@ -111,7 +130,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 foregroundColor: Colors.black,
               ),
               child: Text("Upload ID Document"),
-              onPressed: () {},  // TODO: Add file upload functionality
+              onPressed: () {}, // TODO: Add file upload functionality
             ),
 
             SizedBox(height: 10),
@@ -123,7 +142,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 foregroundColor: Colors.black,
               ),
               child: Text("Upload Selfie"),
-              onPressed: () {},  // TODO: Add camera/file upload functionality
+              onPressed: () {}, // TODO: Add camera/file upload functionality
             ),
 
             SizedBox(height: 20),
@@ -132,7 +151,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                minimumSize: Size(double.infinity, 50),  // Full width
+                minimumSize: Size(double.infinity, 50), // Full width
               ),
               child: Text("Submit"),
 

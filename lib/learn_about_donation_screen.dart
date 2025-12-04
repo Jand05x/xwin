@@ -16,7 +16,7 @@ class Article {
 
 // StatelessWidget because article list is static
 class LearnAboutDonationScreen extends StatelessWidget {
-  LearnAboutDonationScreen({super.key});
+  const LearnAboutDonationScreen({super.key});
 
   // List of educational articles
   final List<Article> _articles = const [
@@ -25,7 +25,7 @@ class LearnAboutDonationScreen extends StatelessWidget {
       title: "Benefits of Blood Donation",
       description: "Learn how donating helps your health and saves lives.",
       content:
-      "Donating blood is one of the easiest ways to help people in emergencies, surgeries, and cancer treatment. "
+          "Donating blood is one of the easiest ways to help people in emergencies, surgeries, and cancer treatment. "
           "One donation can save up to three lives because blood is separated into red cells, plasma, and platelets.\n\n"
           "Regular donors may also benefit from basic health checks done before each donation such as blood pressure "
           "and hemoglobin tests. Some studies suggest that regular donation can help reduce iron overload in people "
@@ -39,7 +39,7 @@ class LearnAboutDonationScreen extends StatelessWidget {
       title: "Who Can Donate?",
       description: "Basic eligibility rules and safety information.",
       content:
-      "Most healthy adults can donate blood, but there are a few important rules to keep everyone safe. "
+          "Most healthy adults can donate blood, but there are a few important rules to keep everyone safe. "
           "In general, you must be within the allowed age range in your country, meet the minimum weight, and feel well "
           "on the day of donation.\n\n"
           "Doctors will ask about your medical history, medications, travel, and lifestyle to be sure donating is safe "
@@ -54,7 +54,7 @@ class LearnAboutDonationScreen extends StatelessWidget {
       title: "How to Prepare for Donation Day",
       description: "Simple steps to make your donation easier and safer.",
       content:
-      "Good preparation makes blood donation more comfortable. The day before, drink plenty of water and have "
+          "Good preparation makes blood donation more comfortable. The day before, drink plenty of water and have "
           "regular meals. Avoid heavy, very fatty foods right before donating, as they can affect some test results.\n\n"
           "On the day of donation, wear comfortable clothes with sleeves that can be rolled up. Bring an ID card and any "
           "medical information you may need.\n\n"
@@ -68,7 +68,7 @@ class LearnAboutDonationScreen extends StatelessWidget {
       title: "Common Myths About Blood Donation",
       description: "Clearing up fears and misunderstandings.",
       content:
-      "Many people are afraid to donate because of myths they have heard. One common myth is that donating blood "
+          "Many people are afraid to donate because of myths they have heard. One common myth is that donating blood "
           "makes you weak for a long time. In reality, your body replaces the donated fluid within 24 hours and the red "
           "blood cells within a few weeks.\n\n"
           "Another myth is that you can get infections from donating. Donation centers use new, sterile needles for every "
@@ -90,7 +90,8 @@ class LearnAboutDonationScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
 
-        child: ListView(  // Scrollable content
+        child: ListView(
+          // Scrollable content
           children: [
             const SizedBox(height: 20),
 
@@ -115,7 +116,7 @@ class LearnAboutDonationScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 20),
                 child: _buildArticleCard(context, article),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -125,9 +126,9 @@ class LearnAboutDonationScreen extends StatelessWidget {
   // Creates a clickable article preview card
   Widget _buildArticleCard(BuildContext context, Article article) {
     return Card(
-      elevation: 4,  // Shadow depth
+      elevation: 4, // Shadow depth
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),  // Rounded corners
+        borderRadius: BorderRadius.circular(12), // Rounded corners
       ),
 
       // InkWell makes card clickable with ripple effect
@@ -184,7 +185,7 @@ class LearnAboutDonationScreen extends StatelessWidget {
                   SizedBox(width: 4),
                   Icon(Icons.arrow_forward_ios, size: 14, color: Colors.red),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -195,7 +196,7 @@ class LearnAboutDonationScreen extends StatelessWidget {
 
 // Full article detail screen
 class ArticleDetailScreen extends StatelessWidget {
-  final Article article;  // Article to display
+  final Article article; // Article to display
 
   const ArticleDetailScreen({super.key, required this.article});
 
@@ -203,18 +204,16 @@ class ArticleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // Top app bar with article title
-      appBar: AppBar(
-        title: Text(article.title),
-        backgroundColor: Colors.red,
-      ),
+      appBar: AppBar(title: Text(article.title), backgroundColor: Colors.red),
 
-      body: SingleChildScrollView(  // Make content scrollable
+      body: SingleChildScrollView(
+        // Make content scrollable
         padding: const EdgeInsets.all(16),
 
         // Display full article content
         child: Text(
           article.content,
-          style: const TextStyle(fontSize: 16, height: 1.5),  // Line spacing
+          style: const TextStyle(fontSize: 16, height: 1.5), // Line spacing
         ),
       ),
     );

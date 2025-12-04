@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 // StatelessWidget because verification cards are static (in real app would be dynamic)
 class VerificationQueueScreen extends StatelessWidget {
+  const VerificationQueueScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,10 +15,10 @@ class VerificationQueueScreen extends StatelessWidget {
       ),
 
       body: Padding(
-        padding: EdgeInsets.all(16),  // Space around content
+        padding: EdgeInsets.all(16), // Space around content
 
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,  // Align to left
+          crossAxisAlignment: CrossAxisAlignment.start, // Align to left
 
           children: [
             // Shows total pending verifications
@@ -35,7 +37,7 @@ class VerificationQueueScreen extends StatelessWidget {
             // Button to move to next application
             Center(
               child: TextButton(
-                onPressed: () {},  // TODO: Load next application
+                onPressed: () {}, // TODO: Load next application
                 child: Text("Next Application →"),
               ),
             ),
@@ -48,9 +50,9 @@ class VerificationQueueScreen extends StatelessWidget {
   // Creates a card showing donor application details
   Widget _buildVerificationCard() {
     return Card(
-      elevation: 4,  // Shadow depth
+      elevation: 4, // Shadow depth
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),  // Rounded corners
+        borderRadius: BorderRadius.circular(12), // Rounded corners
       ),
 
       child: Padding(
@@ -88,7 +90,7 @@ class VerificationQueueScreen extends StatelessWidget {
               children: [
                 // Approve button - verifies donor
                 ElevatedButton(
-                  onPressed: () {},  // TODO: Approve applicant
+                  onPressed: () {}, // TODO: Approve applicant
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                   ),
@@ -97,10 +99,8 @@ class VerificationQueueScreen extends StatelessWidget {
 
                 // Reject button - denies application
                 ElevatedButton(
-                  onPressed: () {},  // TODO: Reject applicant
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
+                  onPressed: () {}, // TODO: Reject applicant
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   child: Text("Reject"),
                 ),
               ],
@@ -111,10 +111,10 @@ class VerificationQueueScreen extends StatelessWidget {
             // Button to view uploaded documents
             Center(
               child: TextButton(
-                onPressed: () {},  // TODO: Open document viewer
+                onPressed: () {}, // TODO: Open document viewer
                 child: Text("View Documents"),
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -3,38 +3,53 @@ import 'package:flutter/material.dart';
 
 // StatelessWidget because screen doesn't need to track state changes
 class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: null,  // No app bar, content starts from top
-      backgroundColor: Colors.white,
+      // Top app bar
+      appBar: AppBar(
+        title: Text("Dashboard"),
+        backgroundColor: Colors.red,
+        automaticallyImplyLeading: false,
+        actions: [
+          // Notifications bell icon
+          IconButton(
+            icon: Icon(Icons.notifications, size: 28),
+            onPressed: () => Navigator.pushNamed(context, "/notifications"),
+          ),
+        ],
+      ),
 
       body: Padding(
-        padding: EdgeInsets.all(16),  // Space around content
+        padding: EdgeInsets.all(16), // Space around content
 
-        child: ListView(  // Scrollable list of widgets
+        child: ListView(
+          // Scrollable list of widgets
           children: [
-            // Statistics section showing user's donation stats
+            // Welcome message with username
+            Text(
+              "Welcome, User",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
 
+            SizedBox(height: 20),
+
+            // Statistics section showing user's donation stats
             Row(
               children: [
                 // Donations count card
-                Expanded(
-                  child: _statCard("12", "Donations"),
-                ),
-                SizedBox(width: 15),  // Space between cards
-
+                Expanded(child: _statCard("12", "Your Donations")),
+                SizedBox(width: 15), // Space between cards
                 // Points count card
-                Expanded(
-                  child: _statCard("240", "Points"),
-                ),
+                Expanded(child: _statCard("240", "Your Points")),
               ],
             ),
 
             SizedBox(height: 20),
 
             // Quick action buttons for main features
-
 
             // Button to view blood requests
             _quickAction(
@@ -46,7 +61,7 @@ class DashboardScreen extends StatelessWidget {
             // Button to view donation events
             _quickAction(
               icon: Icons.event,
-              text: "Upcoming Events",
+              text: "Events",
               onTap: () => Navigator.pushNamed(context, "/events"),
             ),
 
@@ -61,12 +76,14 @@ class DashboardScreen extends StatelessWidget {
                   builder: (context) => AlertDialog(
                     title: Text("Eligibility Requirements"),
                     content: Text(
-                        "To donate blood, you must:\n\n"
-                            "✓ Be 18-65 years old\n"
-                            "✓ Weigh at least 50 kg\n"
-                            "✓ Be in good health\n"
-                            "✓ Not have donated in last 3 months\n"
-                            "✓ Not have cold/flu\n"
+                      "To donate blood, you must:\n\n"
+                      "✓ Be 18-65 years old\n"
+                      "✓ Weigh at least 50 kg\n"
+                      "✓ Be in good health\n"
+                      "✓ Not have donated in last 3 months\n"
+                      "✓ Not have cold/flu\n"
+                      "✓ Pass a blood test to confirm health\n"
+                      "✓ After passing the blood test, you can donate\n",
                     ),
                     actions: [
                       TextButton(
@@ -82,7 +99,6 @@ class DashboardScreen extends StatelessWidget {
             SizedBox(height: 20),
 
             // Additional options section
-
             Text(
               "More Options",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -97,11 +113,11 @@ class DashboardScreen extends StatelessWidget {
               onTap: () => Navigator.pushNamed(context, "/hospital_dashboard"),
             ),
 
-            // Button to admin verification queue
+            // Button to admin dashboard
             _quickAction(
-              icon: Icons.verified_user,
-              text: "Verification Queue",
-              onTap: () => Navigator.pushNamed(context, "/verify"),
+              icon: Icons.admin_panel_settings,
+              text: "Admin Dashboard",
+              onTap: () => Navigator.pushNamed(context, "/admin_dashboard"),
             ),
 
             // Button to educational articles
@@ -113,9 +129,7 @@ class DashboardScreen extends StatelessWidget {
 
             SizedBox(height: 25),
 
-
             // Notifications section
-
             Text(
               "Recent Notifications",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -142,8 +156,8 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green[100],  // Light green background
-        borderRadius: BorderRadius.circular(12),  // Rounded corners
+        color: Colors.green[100], // Light green background
+        borderRadius: BorderRadius.circular(12), // Rounded corners
       ),
       child: Column(
         children: [
@@ -168,10 +182,10 @@ class DashboardScreen extends StatelessWidget {
   }) {
     return Card(
       child: ListTile(
-        leading: Icon(icon, color: Colors.red),  // Icon on left
-        title: Text(text),  // Action text
-        trailing: Icon(Icons.arrow_forward_ios, size: 16),  // Arrow on right
-        onTap: () => onTap(),  // Execute action when tapped
+        leading: Icon(icon, color: Colors.red), // Icon on left
+        title: Text(text), // Action text
+        trailing: Icon(Icons.arrow_forward_ios, size: 16), // Arrow on right
+        onTap: () => onTap(), // Execute action when tapped
       ),
     );
   }
