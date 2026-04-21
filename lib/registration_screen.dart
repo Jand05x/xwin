@@ -1,7 +1,7 @@
-// Screen where new donors register their information
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Added for proper user ID management
 
-// StatefulWidget because we need to track input and dropdown selections
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
 
@@ -10,204 +10,179 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  // Controllers to get text from input fields
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController lastDonationController = TextEditingController();
 
-  // Variable to store selected blood type from dropdown
   String? selectedBloodType;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    lastDonationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _registerDonor() async {
+    try {
+      // 1. Create the user in Firebase Authentication first
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      String uid = userCredential.user!.uid;
+
+      // 2. Save to 'users' collection (This controls the Dashboard/Permissions)
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'uid': uid,
+        'name': nameController.text.trim(),
+        'email': emailController.text.trim(),
+        'role': 'donor', // New signups are donors by default
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // 3. Save to 'donors' collection (This stores the medical data)
+      await FirebaseFirestore.instance.collection('donors').doc(uid).set({
+        'uid': uid,
+        'name': nameController.text.trim(),
+        'email': emailController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'bloodType': selectedBloodType,
+        'lastDonation': lastDonationController.text,
+        'status': 'pending',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Registration Successful!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pushReplacementNamed(context, "/home");
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Registration failed: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Top app bar
       appBar: AppBar(
         backgroundColor: Colors.red,
-        title: Text("Donor Registration"),
+        title: const Text("Donor Registration"),
       ),
-
       body: SingleChildScrollView(
-        // Makes screen scrollable if content is long
-        padding: EdgeInsets.all(16), // Space around content
-
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Full name input field
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: "Full Name"),
+              decoration: const InputDecoration(labelText: "Full Name"),
             ),
-
-            SizedBox(height: 10),
-
-            // Email input field
+            const SizedBox(height: 10),
             TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: "Email"),
+              decoration: const InputDecoration(labelText: "Email"),
             ),
-
-            SizedBox(height: 10),
-
-            // Phone number input field
+            const SizedBox(height: 10),
             TextField(
               controller: phoneController,
-              decoration: InputDecoration(labelText: "Phone Number"),
+              decoration: const InputDecoration(labelText: "Phone Number"),
             ),
-
-            SizedBox(height: 10),
-
-            // Password input field
+            const SizedBox(height: 10),
             TextField(
               controller: passwordController,
-              decoration: InputDecoration(labelText: "Password"),
+              decoration: const InputDecoration(labelText: "Password"),
               obscureText: true,
             ),
-
-            SizedBox(height: 10),
-
-            // Blood type dropdown menu
+            const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-              initialValue: selectedBloodType, // Currently selected value
-              // List of blood type options
+              value: selectedBloodType,
               items: [
-                "A+",
-                "A-",
-                "B+",
-                "B-",
-                "O+",
-                "O-",
-                "AB+",
-                "AB-",
+                "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-",
               ].map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
-
-              // Called when user selects an option
               onChanged: (v) {
-                setState(() => selectedBloodType = v); // Update selected value
+                setState(() => selectedBloodType = v);
               },
-
-              decoration: InputDecoration(labelText: "Blood Type"),
+              decoration: const InputDecoration(labelText: "Blood Type"),
             ),
-
-            SizedBox(height: 10),
-
-            // Date picker field for last donation
+            const SizedBox(height: 10),
             TextField(
               controller: lastDonationController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Last Donation Date",
                 hintText: "Tap to select date",
-                suffixIcon: Icon(Icons.calendar_today), // Calendar icon
+                suffixIcon: Icon(Icons.calendar_today),
               ),
-              readOnly: true, // Prevent manual typing, only allow date picker
-              // When field is tapped, show date picker
+              readOnly: true,
               onTap: () async {
-                // Show date picker dialog
                 DateTime? picked = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(), // Start at today
-                  firstDate: DateTime(2000), // Earliest selectable date
-                  lastDate: DateTime.now(), // Can't select future dates
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
                 );
-
-                // If user selected a date (didn't cancel)
                 if (picked != null) {
-                  // Format and display the selected date
-                  lastDonationController.text =
-                      "${picked.day}/${picked.month}/${picked.year}";
+                  setState(() {
+                    lastDonationController.text =
+                        "${picked.day}/${picked.month}/${picked.year}";
+                  });
                 }
               },
             ),
-
-            SizedBox(height: 20),
-
-            // Button to upload ID document (placeholder functionality)
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[300],
                 foregroundColor: Colors.black,
               ),
-              child: Text("Upload ID Document"),
-              onPressed: () {}, // TODO: Add file upload functionality
+              child: const Text("Upload ID Document"),
+              onPressed: () {}, 
             ),
-
-            SizedBox(height: 10),
-
-            // Button to upload selfie (placeholder functionality)
+            const SizedBox(height: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[300],
                 foregroundColor: Colors.black,
               ),
-              child: Text("Upload Selfie"),
-              onPressed: () {}, // TODO: Add camera/file upload functionality
+              child: const Text("Upload Selfie"),
+              onPressed: () {}, 
             ),
-
-            SizedBox(height: 20),
-
-            // Submit button
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                minimumSize: Size(double.infinity, 50), // Full width
+                minimumSize: const Size(double.infinity, 50),
               ),
-              child: Text("Submit"),
-
+              child: const Text("Submit"),
               onPressed: () {
-                // Validate all required fields are filled
-
-                // Check name
-                if (nameController.text.isEmpty) {
+                if (nameController.text.isEmpty || 
+                    emailController.text.isEmpty || 
+                    phoneController.text.isEmpty || 
+                    selectedBloodType == null ||
+                    passwordController.text.length < 6) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please enter your name")),
+                    const SnackBar(content: Text("Please fill all fields (Password min 6 chars)")),
                   );
                   return;
                 }
-
-                // Check email
-                if (emailController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please enter your email")),
-                  );
-                  return;
-                }
-
-                // Validate email format
-                if (!emailController.text.contains('@')) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please enter a valid email")),
-                  );
-                  return;
-                }
-
-                // Check phone
-                if (phoneController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please enter your phone number")),
-                  );
-                  return;
-                }
-
-                // Check blood type selection
-                if (selectedBloodType == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please select your blood type")),
-                  );
-                  return;
-                }
-
-                // If all validations pass, show success message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Registration Successful!"),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-
-                // Navigate to home screen and remove all previous screens
-                Navigator.pushReplacementNamed(context, "/home");
+                _registerDonor();
               },
             ),
           ],

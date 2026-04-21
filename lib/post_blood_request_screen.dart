@@ -1,5 +1,6 @@
 // Screen where hospitals post new blood requests
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Added for database integration
 
 // StatefulWidget because we need to track form inputs and selections
 class PostBloodRequestScreen extends StatefulWidget {
@@ -17,6 +18,14 @@ class _PostBloodRequestScreenState extends State<PostBloodRequestScreen> {
   // Variables to store dropdown selections
   String? selectedBloodType;
   String? selectedUrgency;
+
+  // Task: Properly dispose of controllers to prevent memory leaks
+  @override
+  void dispose() {
+    unitsController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +64,7 @@ class _PostBloodRequestScreenState extends State<PostBloodRequestScreen> {
 
             // Dropdown to select blood type needed
             DropdownButtonFormField<String>(
-              initialValue: selectedBloodType, // Currently selected value
+              value: selectedBloodType, // Changed from initialValue for better State control
               decoration: InputDecoration(
                 labelText: "Blood Type Needed",
                 border: OutlineInputBorder(
@@ -76,14 +85,7 @@ class _PostBloodRequestScreenState extends State<PostBloodRequestScreen> {
 
               // List of blood type options
               items: [
-                "A+",
-                "A-",
-                "B+",
-                "B-",
-                "O+",
-                "O-",
-                "AB+",
-                "AB-",
+                "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-",
               ].map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
 
               // Called when user selects an option
@@ -122,10 +124,12 @@ class _PostBloodRequestScreenState extends State<PostBloodRequestScreen> {
 
             // Dropdown to select urgency level
             DropdownButtonFormField<String>(
-              initialValue: selectedUrgency, // Currently selected value
+              value: selectedUrgency,
               decoration: InputDecoration(
                 labelText: "Urgency Level",
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 prefixIcon: Icon(Icons.warning, color: Colors.orange),
               ),
 
@@ -150,7 +154,9 @@ class _PostBloodRequestScreenState extends State<PostBloodRequestScreen> {
               maxLines: 4, // Multi-line text area
               decoration: InputDecoration(
                 labelText: "Additional Details (Optional)",
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 hintText: "Patient condition, specific requirements...",
               ),
             ),
@@ -168,10 +174,14 @@ class _PostBloodRequestScreenState extends State<PostBloodRequestScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: _submitRequest, // Call validation function
+                onPressed: _submitRequest, // Call validation and firebase function
                 child: Text(
                   "Post Request",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18, 
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -181,41 +191,60 @@ class _PostBloodRequestScreenState extends State<PostBloodRequestScreen> {
     );
   }
 
-  // Validates form and submits blood request
-  void _submitRequest() {
-    // Validate blood type is selected
+  // Task: Validates form and submits blood request to Firestore
+  Future<void> _submitRequest() async {
+    // 1. Validations
     if (selectedBloodType == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please select blood type")));
-      return; // Stop execution
+      _showMsg("Please select blood type");
+      return;
     }
-
-    // Validate units field is filled
     if (unitsController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please enter number of units")));
+      _showMsg("Please enter number of units");
       return;
     }
-
-    // Validate urgency is selected
     if (selectedUrgency == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please select urgency level")));
+      _showMsg("Please select urgency level");
       return;
     }
 
-    // If all validations pass, show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Blood request posted successfully!"),
-        backgroundColor: Colors.green,
-      ),
-    );
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
 
-    // Return to hospital dashboard
-    Navigator.pop(context);
+      // 2. Database Submission
+      await FirebaseFirestore.instance.collection('requests').add({
+        'bloodType': selectedBloodType,
+        'units': int.tryParse(unitsController.text) ?? 1,
+        'urgency': selectedUrgency,
+        'description': descriptionController.text.trim(),
+        'status': 'active', // Important for dashboard filtering
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // Remove loading indicator
+      Navigator.pop(context);
+
+      // 3. Success Feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Blood request posted successfully!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Return to hospital dashboard
+      Navigator.pop(context);
+    } catch (e) {
+      Navigator.pop(context); // Remove loading
+      _showMsg("Failed to post request: $e");
+    }
+  }
+
+  void _showMsg(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }

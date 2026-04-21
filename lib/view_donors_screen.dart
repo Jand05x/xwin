@@ -1,209 +1,162 @@
-// Screen showing list of registered blood donors
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-// StatelessWidget because donor list is static (in real app would fetch from database)
 class ViewDonorsScreen extends StatelessWidget {
-  // Sample donor data (in production, this comes from backend database)
-  final List<Map<String, dynamic>> donors = [
-    {
-      "name": "Ahmed Ali",
-      "bloodType": "A+",
-      "phone": "0770 123 4567",
-      "lastDonation": "2 months ago",
-      "totalDonations": 5,
-      "status": "Available", // Whether donor can donate now
-    },
-    {
-      "name": "Sara Mohammed",
-      "bloodType": "O+",
-      "phone": "0750 987 6543",
-      "lastDonation": "4 months ago",
-      "totalDonations": 8,
-      "status": "Available",
-    },
-    {
-      "name": "Jand Ayoub",
-      "bloodType": "B+",
-      "phone": "0780 456 7890",
-      "lastDonation": "1 month ago",
-      "totalDonations": 3,
-      "status": "Not Available", // Too recent donation
-    },
-    {
-      "name": "Layla Hassan",
-      "bloodType": "AB+",
-      "phone": "0760 321 9876",
-      "lastDonation": "6 months ago",
-      "totalDonations": 12,
-      "status": "Available",
-    },
-    {
-      "name": "Omar Khalil",
-      "bloodType": "O-",
-      "phone": "0770 555 4444",
-      "lastDonation": "3 months ago",
-      "totalDonations": 7,
-      "status": "Available",
-    },
-  ];
-
-   ViewDonorsScreen({super.key});
+  // Added 'const' to satisfy the lint warning task
+  const ViewDonorsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Top app bar with search button
       appBar: AppBar(
-        title: Text("Registered Donors"),
+        title: const Text("Registered Donors"),
         backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
         actions: [
-          // Search icon button (placeholder functionality)
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Search feature coming soon!")),
+                const SnackBar(content: Text("Search feature coming soon!")),
               );
             },
           ),
         ],
       ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('donors').snapshots(),
+        builder: (context, snapshot) {
+          // Error handling widget added for code quality task
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text("Error: ${snapshot.error}"),
+                ],
+              ),
+            );
+          }
 
-      body: Column(
-        children: [
-          // Statistics bar at top
-          Container(
-            padding: EdgeInsets.all(16),
-            color: Colors.red[50], // Light red background
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // Total donors count
-                _buildStatItem("Total Donors", "${donors.length}"),
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.red));
+          }
 
-                // Available donors count (filtered from list)
-                _buildStatItem(
-                  "Available",
-                  "${donors.where((d) => d['status'] == 'Available').length}",
+          final List<Map<String, dynamic>> donors = snapshot.data!.docs.map((doc) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+
+          return Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.red[50],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatItem("Total Donors", "${donors.length}"),
+                    _buildStatItem(
+                      "Available",
+                      "${donors.where((d) => d['status'] == 'Available').length}",
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-
-          // Scrollable list of donor cards
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.all(16),
-              itemCount: donors.length, // Number of cards to build
-              // Build each donor card
-              itemBuilder: (context, index) {
-                return _buildDonorCard(context, donors[index]);
-              },
-            ),
-          ),
-        ],
+              ),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: donors.length,
+                  itemBuilder: (context, index) {
+                    return _buildDonorCard(context, donors[index]);
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  // Creates a statistic display with label and value
   Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
-        // Large number
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.red,
           ),
         ),
-        SizedBox(height: 4),
-        // Label below number
+        const SizedBox(height: 4),
         Text(label, style: TextStyle(color: Colors.grey[700])),
       ],
     );
   }
 
-  // Creates a donor information card
   Widget _buildDonorCard(BuildContext context, Map<String, dynamic> donor) {
-    // Check if donor is currently available to donate
     bool isAvailable = donor['status'] == 'Available';
 
     return Card(
-      margin: EdgeInsets.only(bottom: 12), // Space below card
-      elevation: 2, // Shadow depth
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // Rounded corners
-      ),
-
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: EdgeInsets.all(16),
-
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             Row(
               children: [
-                // Profile picture placeholder
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.red[100],
-                  child: Icon(Icons.person, size: 35, color: Colors.red),
+                  child: const Icon(Icons.person, size: 35, color: Colors.red),
                 ),
-
-                SizedBox(width: 15),
-
-                // Donor information section
+                const SizedBox(width: 15),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Donor name
                       Text(
-                        donor['name'],
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        donor['name'] ?? "Unknown Donor",
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-
-                      SizedBox(height: 4),
-
-                      // Blood type and donation count
+                      const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.bloodtype, size: 16, color: Colors.red),
-                          SizedBox(width: 4),
+                          const Icon(Icons.bloodtype, size: 16, color: Colors.red),
+                          const SizedBox(width: 4),
                           Text(
-                            donor['bloodType'],
-                            style: TextStyle(
+                            donor['bloodType'] ?? "N/A",
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.red,
                             ),
                           ),
-                          SizedBox(width: 15),
-                          Icon(Icons.favorite, size: 16, color: Colors.pink),
-                          SizedBox(width: 4),
-                          Text("${donor['totalDonations']} donations"),
+                          const SizedBox(width: 15),
+                          const Icon(Icons.favorite, size: 16, color: Colors.pink),
+                          const SizedBox(width: 4),
+                          Text("${donor['totalDonations'] ?? 0} donations"),
                         ],
                       ),
                     ],
                   ),
                 ),
-
-                // Status badge (Available/Not Available)
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: isAvailable ? Colors.green[100] : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(20), // Pill shape
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    donor['status'],
+                    donor['status'] ?? "pending",
                     style: TextStyle(
                       color: isAvailable ? Colors.green[800] : Colors.grey[800],
                       fontWeight: FontWeight.bold,
@@ -213,77 +166,62 @@ class ViewDonorsScreen extends StatelessWidget {
                 ),
               ],
             ),
-
-            SizedBox(height: 12),
-
-            // Contact information row
+            const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.phone, size: 16, color: Colors.grey[600]),
-                SizedBox(width: 6),
-                Text(donor['phone']),
-                SizedBox(width: 20),
-                Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
-                SizedBox(width: 6),
-                Text("Last: ${donor['lastDonation']}"),
+                const Icon(Icons.phone, size: 16, color: Colors.grey),
+                const SizedBox(width: 6),
+                Text(donor['phone'] ?? "No Phone"),
+                const SizedBox(width: 20),
+                const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                const SizedBox(width: 6),
+                Text("Last: ${donor['lastDonation'] ?? "Never"}"),
               ],
             ),
-
-            SizedBox(height: 12),
-
-            // Contact button (only enabled if donor is available)
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: Icon(Icons.call, size: 18),
-                label: Text("Contact Donor"),
+                icon: const Icon(Icons.call, size: 18, color: Colors.white),
+                label: const Text("Contact Donor", style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  // Button color changes based on availability
                   backgroundColor: isAvailable ? Colors.red : Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-
-                // Button only works if donor is available
                 onPressed: isAvailable
                     ? () {
-                        // Show confirmation dialog
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text("Contact ${donor['name']}"),
-                            content: Text("Call ${donor['phone']}?"),
-                            actions: [
-                              // Cancel button
-                              TextButton(
-                                child: Text("Cancel"),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                              // Call button
-                              TextButton(
-                                child: Text("Call"),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  // Show calling message (in real app, would initiate phone call)
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Calling ${donor['name']}...",
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        );
+                        _showContactDialog(context, donor['name'], donor['phone']);
                       }
-                    : null, // Disabled if not available
+                    : null,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showContactDialog(BuildContext context, String? name, String? phone) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Contact ${name ?? 'Donor'}"),
+        content: Text("Call ${phone ?? 'this number'}?"),
+        actions: [
+          TextButton(
+            child: const Text("Cancel"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text("Call"),
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Calling ${name ?? 'Donor'}...")),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

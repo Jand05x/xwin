@@ -1,149 +1,98 @@
-// Screen showing system notifications and alerts
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-// StatelessWidget for displaying notifications
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
+  // Task: Implementation for clearing notifications
+  Future<void> _clearAllNotifications(BuildContext context) async {
+    final collection = FirebaseFirestore.instance.collection('notifications');
+    final snapshots = await collection.get();
+    for (var doc in snapshots.docs) {
+      await doc.reference.delete();
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("All notifications cleared")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Sample notifications (in real app, would come from backend)
-    final List<Map<String, dynamic>> notifications = [
-      {
-        "type": "match",
-        "title": "Blood Match Found!",
-        "message": "Your blood type A+ is needed at Central Hospital",
-        "timestamp": "2 hours ago",
-        "icon": Icons.check_circle,
-        "color": Colors.green,
-      },
-      {
-        "type": "eligibility",
-        "title": "Eligibility Updated",
-        "message": "You are now eligible to donate again",
-        "timestamp": "1 day ago",
-        "icon": Icons.verified,
-        "color": Colors.blue,
-      },
-      {
-        "type": "event",
-        "title": "Event Reminder",
-        "message": "Blood drive at City Hospital starts in 2 days",
-        "timestamp": "3 days ago",
-        "icon": Icons.event,
-        "color": Colors.orange,
-      },
-      {
-        "type": "urgent",
-        "title": "Urgent: O- Blood Needed",
-        "message":
-            "Emergency blood request - Regional Hospital needs O- donors now",
-        "timestamp": "5 hours ago",
-        "icon": Icons.warning,
-        "color": Colors.red,
-      },
-      {
-        "type": "verification",
-        "title": "Verification Approved",
-        "message": "Your identity has been verified successfully",
-        "timestamp": "1 week ago",
-        "icon": Icons.done_all,
-        "color": Colors.green,
-      },
-      {
-        "type": "event",
-        "title": "Event Cancelled",
-        "message": "Blood drive at Downtown Center has been postponed",
-        "timestamp": "1 week ago",
-        "icon": Icons.cancel,
-        "color": Colors.grey,
-      },
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notifications"),
+        title: const Text("Notifications"),
         backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
         actions: [
-          // Clear all notifications button
           IconButton(
-            icon: Icon(Icons.clear_all),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("All notifications cleared")),
-              );
-            },
+            icon: const Icon(Icons.clear_all),
+            onPressed: () => _clearAllNotifications(context),
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(8),
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final notification = notifications[index];
-          return _buildNotificationCard(notification);
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('notifications')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return Center(child: Text("Error: ${snapshot.error}"));
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.red));
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _buildEmptyState();
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) => _buildNotificationCard(context, snapshot.data!.docs[index]),
+          );
         },
       ),
     );
   }
 
-  // Builds individual notification card
-  Widget _buildNotificationCard(Map<String, dynamic> notification) {
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.notifications_none, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text("No new notifications", style: TextStyle(color: Colors.grey[600])),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationCard(BuildContext context, DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    
+    IconData iconData = Icons.notifications;
+    Color iconColor = Colors.grey;
+
+    if (data['type'] == 'match') { iconData = Icons.check_circle; iconColor = Colors.green; }
+    else if (data['type'] == 'urgent') { iconData = Icons.warning; iconColor = Colors.red; }
+    else if (data['type'] == 'event') { iconData = Icons.event; iconColor = Colors.blue; }
+
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      child: Padding(
-        padding: EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Notification icon
-            Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: notification['color'].withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                notification['icon'],
-                color: notification['color'],
-                size: 28,
-              ),
-            ),
-            SizedBox(width: 12),
-            // Notification content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title
-                  Text(
-                    notification['title'],
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 4),
-                  // Message
-                  Text(
-                    notification['message'],
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                  ),
-                  SizedBox(height: 6),
-                  // Timestamp
-                  Text(
-                    notification['timestamp'],
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            ),
-            // Action button based on notification type
-            if (notification['type'] == 'match')
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                onPressed: () {},
-                child: Text("Respond", style: TextStyle(fontSize: 12)),
-              ),
-          ],
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: iconColor.withOpacity(0.1),
+          child: Icon(iconData, color: iconColor),
         ),
+        title: Text(data['title'] ?? 'Notification', style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(data['message'] ?? ''),
+        trailing: data['type'] == 'match' 
+          ? ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+              onPressed: () => Navigator.pushNamed(context, '/requests'),
+              child: const Text("Respond"),
+            )
+          : null,
       ),
     );
   }

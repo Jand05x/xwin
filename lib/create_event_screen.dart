@@ -1,5 +1,6 @@
 // Screen where hospitals create blood donation events
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Added for database integration
 
 // StatefulWidget because we need to track form inputs
 class CreateEventScreen extends StatefulWidget {
@@ -17,21 +18,33 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final TextEditingController timeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
+  // Task: Cleanup controllers to prevent memory leaks
+  @override
+  void dispose() {
+    titleController.dispose();
+    locationController.dispose();
+    dateController.dispose();
+    timeController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Top app bar
-      appBar: AppBar(title: Text("Create Event"), backgroundColor: Colors.blue),
+      appBar: AppBar(
+        title: Text("Create Event"), 
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
 
       body: SingleChildScrollView(
-        // Makes form scrollable
-        padding: EdgeInsets.all(16), // Space around form
+        padding: EdgeInsets.all(16),
 
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // Align to left
+          crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
-            // Form section title
             Text(
               "Event Information",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -74,21 +87,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
                 hintText: "Tap to select date",
               ),
-              readOnly: true, // Prevent manual typing
-              // When tapped, show date picker dialog
+              readOnly: true, 
               onTap: () async {
                 DateTime? picked = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(), // Start at today
-                  firstDate: DateTime.now(), // Can't select past dates
-                  lastDate: DateTime(2026), // Can select up to year 2026
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2027), // Extended range
                 );
 
-                // If user selected a date (didn't cancel)
                 if (picked != null) {
-                  // Format and display the selected date
-                  dateController.text =
-                      "${picked.day}/${picked.month}/${picked.year}";
+                  dateController.text = "${picked.day}/${picked.month}/${picked.year}";
                 }
               },
             ),
@@ -104,20 +113,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 prefixIcon: Icon(Icons.access_time, color: Colors.blue),
                 hintText: "Tap to select time",
               ),
-              readOnly: true, // Prevent manual typing
-              // When tapped, show time picker dialog
+              readOnly: true,
               onTap: () async {
-                final ctx = context;
-                // ignore: use_build_context_synchronously
                 TimeOfDay? picked = await showTimePicker(
-                  context: ctx,
-                  initialTime: TimeOfDay.now(), // Start at current time
+                  context: context,
+                  initialTime: TimeOfDay.now(),
                 );
 
-                // If user selected a time (didn't cancel)
-                if (picked != null && mounted) {
-                  // ignore: use_build_context_synchronously
-                  timeController.text = picked.format(ctx);
+                if (picked != null) {
+                  timeController.text = picked.format(context);
                 }
               },
             ),
@@ -127,7 +131,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             // Event description input (multi-line)
             TextField(
               controller: descriptionController,
-              maxLines: 4, // Multi-line text area
+              maxLines: 4,
               decoration: InputDecoration(
                 labelText: "Event Description",
                 border: OutlineInputBorder(),
@@ -139,16 +143,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
             // Create event button
             SizedBox(
-              width: double.infinity, // Full width
+              width: double.infinity,
               height: 50,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: _createEvent, // Call validation function
+                onPressed: _createEvent, // Call logic function
                 child: Text(
                   "Create Event",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -161,49 +166,53 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  // Validates form and creates event
-  void _createEvent() {
-    // Validate title is filled
-    if (titleController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please enter event title")));
-      return; // Stop execution
-    }
-
-    // Validate location is filled
-    if (locationController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please enter location")));
+  // Task: Logic to save event data to Firestore
+  Future<void> _createEvent() async {
+    // 1. Validation
+    if (titleController.text.isEmpty || 
+        locationController.text.isEmpty || 
+        dateController.text.isEmpty || 
+        timeController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill in all required fields"))
+      );
       return;
     }
 
-    // Validate date is selected
-    if (dateController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please select event date")));
-      return;
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // 2. Database Submission
+      await FirebaseFirestore.instance.collection('events').add({
+        'title': titleController.text.trim(),
+        'location': locationController.text.trim(),
+        'date': dateController.text,
+        'time': timeController.text,
+        'description': descriptionController.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      Navigator.pop(context); // Remove loading
+
+      // 3. Success Feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Event created successfully!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pop(context); // Go back to dashboard
+    } catch (e) {
+      Navigator.pop(context); // Remove loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error creating event: $e"))
+      );
     }
-
-    // Validate time is selected
-    if (timeController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please select event time")));
-      return;
-    }
-
-    // If all validations pass, show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Event created successfully!"),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-    // Return to previous screen
-    Navigator.pop(context);
   }
 }
